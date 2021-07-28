@@ -1,2 +1,2 @@
-# tshark2json
-tshark2json
+# tshark2pandas
+tshark2pandas

@@ -4,6 +4,16 @@ tshark2pandas
 This (soon to be) small library, allows pandas to directly ingest JSON from tshark (skipping the more typical pyshark intermediate step).
 
 ```
+>>> import pandas as pd
+>>> import tshark2pandas
+>>> df = tshark2pandas.tshark2pandas('/home/josh/tmp/x.cap')
+>>> df['frame_frame_len'].quantile(0.75)
+1392.0
+>>> df['frame_frame_len'].mean()
+863.077
+```
+
+```
 $ /usr/bin/time -v ./tshark2pandas.py ~/tmp/test.cap
         frame_frame_encap_type                 frame_frame_time  frame_frame_offset_shift  frame_frame_time_epoch  frame_frame_time_delta  frame_frame_time_delta_displayed  frame_frame_time_relative  frame_frame_number  ...       ip_ip_src                      ip_ip_addr  ip_ip_src_host                      ip_ip_host        ip_ip_dst   ip_ip_dst_host filtered  eth_eth_padding
 0                            1 2021-07-28 00:43:41.264531+00:00                         0            1.627433e+09                0.000000                          0.000000                   0.000000                   1  ...   142.250.71.78    [142.250.71.78, 192.168.2.2]   142.250.71.78    [142.250.71.78, 192.168.2.2]      192.168.2.2      192.168.2.2     data              NaN

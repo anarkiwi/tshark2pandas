@@ -16,11 +16,16 @@ def tshark2pandas(pcap_filename, layers=None):
     return pd.read_json(jq_proc.stdout, lines=True)
 
 
-if len(sys.argv) == 1:
-    print('need cap')
-    sys.exit(0)
+def main():
+    if len(sys.argv) == 1:
+        print('need cap')
+        sys.exit(0)
 
-for pcap_filename in sys.argv[1:]:
-    df = tshark2pandas(pcap_filename)
-    print(df)
-    print(df.dtypes.to_string())
+    for pcap_filename in sys.argv[1:]:
+        df = tshark2pandas(pcap_filename)
+        print(df)
+        print(df.dtypes.to_string())
+
+
+if __name__ == '__main__':
+    main()

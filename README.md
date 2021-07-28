@@ -4,245 +4,98 @@ tshark2pandas
 This (soon to be) small library, allows pandas to directly ingest JSON from tshark (skipping the more typical pyshark intermediate step).
 
 ```
-$ ./tshark2pandas.py ~/tmp/x.cap
-     frame_frame_encap_type  ... tls_tls_handshake_extensions_psk_binders
-0                         1  ...                                      NaN
-1                         1  ...                                      NaN
-2                         1  ...                                      NaN
-3                         1  ...                                      NaN
-4                         1  ...                                      NaN
-..                      ...  ...                                      ...
-995                       1  ...                                      NaN
-996                       1  ...                                      NaN
-997                       1  ...                                      NaN
-998                       1  ...                                      NaN
-999                       1  ...                                      NaN
+$ /usr/bin/time -v ./tshark2pandas.py ~/tmp/test.cap
+        frame_frame_encap_type                 frame_frame_time  frame_frame_offset_shift  frame_frame_time_epoch  frame_frame_time_delta  frame_frame_time_delta_displayed  frame_frame_time_relative  frame_frame_number  ...       ip_ip_src                      ip_ip_addr  ip_ip_src_host                      ip_ip_host        ip_ip_dst   ip_ip_dst_host filtered  eth_eth_padding
+0                            1 2021-07-28 00:43:41.264531+00:00                         0            1.627433e+09                0.000000                          0.000000                   0.000000                   1  ...   142.250.71.78    [142.250.71.78, 192.168.2.2]   142.250.71.78    [142.250.71.78, 192.168.2.2]      192.168.2.2      192.168.2.2     data              NaN
+1                            1 2021-07-28 00:43:41.291350+00:00                         0            1.627433e+09                0.026819                          0.026819                   0.026819                   2  ...   142.250.71.78    [142.250.71.78, 192.168.2.2]   142.250.71.78    [142.250.71.78, 192.168.2.2]      192.168.2.2      192.168.2.2     data              NaN
+2                            1 2021-07-28 00:43:41.492988+00:00                         0            1.627433e+09                0.201638                          0.201638                   0.228457                   3  ...     192.168.2.2    [192.168.2.2, 142.250.71.78]     192.168.2.2    [192.168.2.2, 142.250.71.78]    142.250.71.78    142.250.71.78     data              NaN
+3                            1 2021-07-28 00:43:41.571585+00:00                         0            1.627433e+09                0.078597                          0.078597                   0.307054                   4  ...   142.250.71.78    [142.250.71.78, 192.168.2.2]   142.250.71.78    [142.250.71.78, 192.168.2.2]      192.168.2.2      192.168.2.2     data              NaN
+4                            1 2021-07-28 00:43:41.794021+00:00                         0            1.627433e+09                0.222436                          0.222436                   0.529490                   5  ...     192.168.2.2   [192.168.2.2, 142.250.66.202]     192.168.2.2   [192.168.2.2, 142.250.66.202]   142.250.66.202   142.250.66.202     data              NaN
+...                        ...                              ...                       ...                     ...                     ...                               ...                        ...                 ...  ...             ...                             ...             ...                             ...              ...              ...      ...              ...
+299538                       1 2021-07-28 00:44:40.155184+00:00                         0            1.627433e+09                0.016521                          0.016521                  58.890653              299539  ...     192.168.2.2   [192.168.2.2, 142.250.66.202]     192.168.2.2   [192.168.2.2, 142.250.66.202]   142.250.66.202   142.250.66.202     data              NaN
+299539                       1 2021-07-28 00:44:40.212098+00:00                         0            1.627433e+09                0.056914                          0.056914                  58.947567              299540  ...   142.250.71.78    [142.250.71.78, 192.168.2.2]   142.250.71.78    [142.250.71.78, 192.168.2.2]      192.168.2.2      192.168.2.2     data              NaN
+299540                       1 2021-07-28 00:44:40.213003+00:00                         0            1.627433e+09                0.000905                          0.000905                  58.948472              299541  ...  142.250.66.202   [142.250.66.202, 192.168.2.2]  142.250.66.202   [142.250.66.202, 192.168.2.2]      192.168.2.2      192.168.2.2     data              NaN
+299541                       1 2021-07-28 00:44:40.218458+00:00                         0            1.627433e+09                0.005455                          0.005455                  58.953927              299542  ...     192.168.2.2  [192.168.2.2, 172.217.194.189]     192.168.2.2  [192.168.2.2, 172.217.194.189]  172.217.194.189  172.217.194.189     data              NaN
+299542                       1 2021-07-28 00:44:40.246191+00:00                         0            1.627433e+09                0.027733                          0.027733                  58.981660              299543  ...  142.250.66.202   [142.250.66.202, 192.168.2.2]  142.250.66.202   [142.250.66.202, 192.168.2.2]      192.168.2.2      192.168.2.2     data              NaN
 
-[1000 rows x 224 columns]
-frame_frame_encap_type                                                           int64
-frame_frame_time                                                   datetime64[ns, UTC]
-frame_frame_offset_shift                                                         int64
-frame_frame_time_epoch                                                         float64
-frame_frame_time_delta                                                         float64
-frame_frame_time_delta_displayed                                               float64
-frame_frame_time_relative                                                      float64
-frame_frame_number                                                               int64
-frame_frame_len                                                                  int64
-frame_frame_cap_len                                                              int64
-frame_frame_marked                                                                bool
-frame_frame_ignored                                                               bool
-frame_frame_protocols                                                           object
-eth_eth_dst                                                                     object
-eth_eth_dst_resolved                                                            object
-eth_eth_dst_oui                                                                  int64
-eth_eth_dst_oui_resolved                                                        object
-eth_eth_addr                                                                    object
-eth_eth_addr_resolved                                                           object
-eth_eth_addr_oui                                                                 int64
-eth_eth_addr_oui_resolved                                                       object
-eth_eth_dst_lg                                                                    bool
-eth_eth_lg                                                                        bool
-eth_eth_dst_ig                                                                    bool
-eth_eth_ig                                                                        bool
-eth_eth_src                                                                     object
-eth_eth_src_resolved                                                            object
-eth_eth_src_oui                                                                  int64
-eth_eth_src_oui_resolved                                                        object
-eth_eth_src_lg                                                                    bool
-eth_eth_src_ig                                                                    bool
-eth_eth_type                                                                    object
-ip_ip_version                                                                    int64
-ip_ip_hdr_len                                                                    int64
-ip_ip_dsfield                                                                   object
-ip_ip_dsfield_dscp                                                               int64
-ip_ip_dsfield_ecn                                                                int64
-ip_ip_len                                                                        int64
-ip_ip_id                                                                        object
-ip_ip_flags                                                                     object
-ip_ip_flags_rb                                                                    bool
-ip_ip_flags_df                                                                    bool
-ip_ip_flags_mf                                                                    bool
-ip_ip_frag_offset                                                                int64
-ip_ip_ttl                                                                        int64
-ip_ip_proto                                                                      int64
-ip_ip_checksum                                                                  object
-ip_ip_checksum_status                                                            int64
-ip_ip_src                                                                       object
-ip_ip_addr                                                                      object
-ip_ip_src_host                                                                  object
-ip_ip_host                                                                      object
-ip_ip_dst                                                                       object
-ip_ip_dst_host                                                                  object
-udp_udp_srcport                                                                float64
-udp_udp_dstport                                                                float64
-udp_udp_port                                                                    object
-udp_udp_length                                                                 float64
-udp_udp_checksum                                                                object
-udp_udp_checksum_status                                                        float64
-udp_udp_stream                                                                 float64
-text                                                                            object
-udp_udp_time_relative                                                          float64
-udp_udp_time_delta                                                             float64
-data_data_data                                                                  object
-data_data_len                                                                  float64
-tcp_tcp_srcport                                                                float64
-tcp_tcp_dstport                                                                float64
-tcp_tcp_port                                                                    object
-tcp_tcp_stream                                                                 float64
-tcp_tcp_len                                                                    float64
-tcp_tcp_seq                                                                    float64
-tcp_tcp_seq_raw                                                                float64
-tcp_tcp_nxtseq                                                                 float64
-tcp_tcp_ack                                                                    float64
-tcp_tcp_ack_raw                                                                float64
-tcp_tcp_hdr_len                                                                float64
-tcp_tcp_flags                                                                   object
-tcp_tcp_flags_res                                                              float64
-tcp_tcp_flags_ns                                                               float64
-tcp_tcp_flags_cwr                                                              float64
-tcp_tcp_flags_ecn                                                              float64
-tcp_tcp_flags_urg                                                              float64
-tcp_tcp_flags_ack                                                              float64
-tcp_tcp_flags_push                                                             float64
-tcp_tcp_flags_reset                                                            float64
-tcp_tcp_flags_syn                                                              float64
-tcp_tcp_flags_fin                                                              float64
-tcp_tcp_flags_str                                                               object
-tcp_tcp_window_size_value                                                      float64
-tcp_tcp_window_size                                                            float64
-tcp_tcp_window_size_scalefactor                                                float64
-tcp_tcp_checksum                                                                object
-_ws_expert                                                                      object
-tcp_tcp_checksum_status                                                        float64
-tcp_tcp_checksum_calculated                                                     object
-tcp_tcp_urgent_pointer                                                         float64
-tcp_tcp_options                                                                 object
-tcp_options_nop                                                                 object
-tcp_tcp_option_kind                                                            float64
-tcp_options_timestamp                                                           object
-tcp_tcp_option_len                                                             float64
-tcp_tcp_options_timestamp_tsval                                                float64
-tcp_tcp_options_timestamp_tsecr                                                float64
-tcp_tcp_time_relative                                                          float64
-tcp_tcp_time_delta                                                             float64
-tcp_tcp_analysis                                                               float64
-tcp_tcp_analysis_flags                                                         float64
-tcp_options_mss                                                                 object
-tcp_tcp_options_mss_val                                                        float64
-tcp_options_sack_perm                                                           object
-tcp_options_wscale                                                              object
-tcp_tcp_options_wscale_shift                                                   float64
-tcp_tcp_options_wscale_multiplier                                              float64
-eth_eth_padding                                                                 object
-tcp_tcp_analysis_acks_frame                                                    float64
-tcp_tcp_analysis_ack_rtt                                                       float64
-tcp_tcp_analysis_initial_rtt                                                   float64
-tcp_tcp_analysis_bytes_in_flight                                               float64
-tcp_tcp_analysis_push_bytes_sent                                               float64
-tcp_tcp_payload                                                                 object
-tls_tls_record                                                                  object
-tls_tls_record_content_type                                                     object
-tls_tls_record_version                                                          object
-tls_tls_record_length                                                           object
-tls_tls_handshake                                                              float64
-tls_tls_handshake_type                                                         float64
-tls_tls_handshake_length                                                       float64
-tls_tls_handshake_version                                                       object
-tls_tls_handshake_random                                                        object
-tls_tls_handshake_random_time                                      datetime64[ns, UTC]
-tls_tls_handshake_random_bytes                                                  object
-tls_tls_handshake_session_id_length                                            float64
-tls_tls_handshake_session_id                                                    object
-tls_tls_handshake_cipher_suites_length                                         float64
-tls_tls_handshake_ciphersuites                                                 float64
-tls_tls_handshake_ciphersuite                                                   object
-tls_tls_handshake_comp_methods_length                                          float64
-tls_tls_handshake_comp_methods                                                 float64
-tls_tls_handshake_comp_method                                                  float64
-tls_tls_handshake_extensions_length                                            float64
-tls_tls_handshake_extension_type                                                object
-tls_tls_handshake_extension_len                                                 object
-tls_tls_handshake_extension_data                                                object
-tls_tls_handshake_extensions_server_name_list_len                              float64
-tls_tls_handshake_extensions_server_name_type                                  float64
-tls_tls_handshake_extensions_server_name_len                                   float64
-tls_tls_handshake_extensions_server_name                                        object
-tls_tls_handshake_extensions_reneg_info_len                                    float64
-tls_tls_handshake_extensions_supported_groups_length                           float64
-tls_tls_handshake_extensions_supported_groups                                  float64
-tls_tls_handshake_extensions_supported_group                                    object
-tls_tls_handshake_extensions_ec_point_formats_length                           float64
-tls_tls_handshake_extensions_ec_point_formats                                  float64
-tls_tls_handshake_extensions_ec_point_format                                   float64
-tls_tls_handshake_extensions_alpn_len                                          float64
-tls_tls_handshake_extensions_alpn_list                                         float64
-tls_tls_handshake_extensions_alpn_str_len                                       object
-tls_tls_handshake_extensions_alpn_str                                           object
-tls_tls_handshake_extensions_status_request_type                               float64
-tls_tls_handshake_extensions_status_request_responder_ids_len                  float64
-tls_tls_handshake_extensions_status_request_exts_len                           float64
-tls_tls_handshake_sig_hash_alg_len                                             float64
-tls_tls_handshake_sig_hash_algs                                                float64
-tls_tls_handshake_sig_hash_alg                                                  object
-tls_tls_handshake_sig_hash_hash                                                 object
-tls_tls_handshake_sig_hash_sig                                                  object
-tls_tls_handshake_extensions_key_share_client_length                           float64
-tls_tls_handshake_extensions_key_share_group                                    object
-tls_tls_handshake_extensions_key_share_key_exchange_length                      object
-tls_tls_handshake_extensions_key_share_key_exchange                             object
-tls_tls_extension_psk_ke_modes_length                                          float64
-tls_tls_extension_psk_ke_mode                                                  float64
-tls_tls_handshake_extensions_supported_versions_len                            float64
-tls_tls_handshake_extensions_supported_version                                  object
-tls_tls_compress_certificate_algorithms_length                                 float64
-tls_tls_compress_certificate_algorithm                                         float64
-tls_tls_handshake_extensions_padding_data                                       object
-tcp_tcp_segment_data                                                            object
-tls_tls_change_cipher_spec                                                     float64
-tls_tls_record_opaque_type                                                     float64
-tls_tls_app_data                                                                object
-dns_dns_id                                                                      object
-dns_dns_flags                                                                   object
-dns_dns_flags_response                                                         float64
-dns_dns_flags_opcode                                                           float64
-dns_dns_flags_truncated                                                        float64
-dns_dns_flags_recdesired                                                       float64
-dns_dns_flags_z                                                                float64
-dns_dns_flags_checkdisable                                                     float64
-dns_dns_count_queries                                                          float64
-dns_dns_count_answers                                                          float64
-dns_dns_count_auth_rr                                                          float64
-dns_dns_count_add_rr                                                           float64
-dns_dns_qry_name                                                                object
-dns_dns_qry_name_len                                                           float64
-dns_dns_count_labels                                                           float64
-dns_dns_qry_type                                                               float64
-dns_dns_qry_class                                                               object
-dns_dns_resp_name                                                               object
-dns_dns_resp_type                                                               object
-dns_dns_rr_udp_payload_size                                                    float64
-dns_dns_resp_ext_rcode                                                          object
-dns_dns_resp_edns0_version                                                     float64
-dns_dns_resp_z                                                                  object
-dns_dns_resp_z_do                                                              float64
-dns_dns_resp_z_reserved                                                         object
-dns_dns_resp_len                                                                object
-dns_dns_flags_authoritative                                                    float64
-dns_dns_flags_recavail                                                         float64
-dns_dns_flags_authenticated                                                    float64
-dns_dns_flags_rcode                                                            float64
-dns_dns_resp_class                                                              object
-dns_dns_resp_ttl                                                                object
-dns_dns_a                                                                       object
-dns_dns_response_to                                                            float64
-dns_dns_time                                                            datetime64[ns]
-dns_dns_cname                                                                   object
-tls_tls_handshake_extensions_psk_identities_length                             float64
-tls_tls_handshake_extensions_psk_identity_identity_length                      float64
-tls_tls_handshake_extensions_psk_identity_identity                              object
-tls_tls_handshake_extensions_psk_identity_obfuscated_ticket_age                float64
-tls_tls_handshake_extensions_psk_binders_len                                   float64
-tls_tls_handshake_extensions_psk_binders                                       float64
-
+[299543 rows x 56 columns]
+frame_frame_encap_type                            int64
+frame_frame_time                    datetime64[ns, UTC]
+frame_frame_offset_shift                          int64
+frame_frame_time_epoch                          float64
+frame_frame_time_delta                          float64
+frame_frame_time_delta_displayed                float64
+frame_frame_time_relative                       float64
+frame_frame_number                                int64
+frame_frame_len                                   int64
+frame_frame_cap_len                               int64
+frame_frame_marked                                 bool
+frame_frame_ignored                                bool
+frame_frame_protocols                            object
+eth_eth_dst                                      object
+eth_eth_dst_resolved                             object
+eth_eth_dst_oui                                   int64
+eth_eth_dst_oui_resolved                         object
+eth_eth_addr                                     object
+eth_eth_addr_resolved                            object
+eth_eth_addr_oui                                  int64
+eth_eth_addr_oui_resolved                        object
+eth_eth_dst_lg                                     bool
+eth_eth_lg                                         bool
+eth_eth_dst_ig                                     bool
+eth_eth_ig                                         bool
+eth_eth_src                                      object
+eth_eth_src_resolved                             object
+eth_eth_src_oui                                   int64
+eth_eth_src_oui_resolved                         object
+eth_eth_src_lg                                     bool
+eth_eth_src_ig                                     bool
+eth_eth_type                                     object
+ip_ip_version                                   float64
+ip_ip_hdr_len                                   float64
+ip_ip_dsfield                                    object
+ip_ip_dsfield_dscp                              float64
+ip_ip_dsfield_ecn                               float64
+ip_ip_len                                       float64
+ip_ip_id                                         object
+ip_ip_flags                                      object
+ip_ip_flags_rb                                  float64
+ip_ip_flags_df                                  float64
+ip_ip_flags_mf                                  float64
+ip_ip_frag_offset                               float64
+ip_ip_ttl                                       float64
+ip_ip_proto                                     float64
+ip_ip_checksum                                   object
+ip_ip_checksum_status                           float64
+ip_ip_src                                        object
+ip_ip_addr                                       object
+ip_ip_src_host                                   object
+ip_ip_host                                       object
+ip_ip_dst                                        object
+ip_ip_dst_host                                   object
+filtered                                         object
+eth_eth_padding                                  object
+        Command being timed: "./tshark2pandas.py /home/josh/tmp/test.cap"
+        User time (seconds): 70.21
+        System time (seconds): 5.57
+        Percent of CPU this job got: 121%
+        Elapsed (wall clock) time (h:mm:ss or m:ss): 1:02.61
+        Average shared text size (kbytes): 0
+        Average unshared data size (kbytes): 0
+        Average stack size (kbytes): 0
+        Average total size (kbytes): 0
+        Maximum resident set size (kbytes): 4834440
+        Average resident set size (kbytes): 0
+        Major (requiring I/O) page faults: 0
+        Minor (reclaiming a frame) page faults: 2368829
+        Voluntary context switches: 430644
+        Involuntary context switches: 1706
+        Swaps: 0
+        File system inputs: 0
+        File system outputs: 0
+        Socket messages sent: 0
+        Socket messages received: 0
+        Signals delivered: 0
+        Page size (bytes): 4096
+        Exit status: 0
 ```
-

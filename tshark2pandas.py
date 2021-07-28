@@ -5,10 +5,14 @@ import subprocess
 import sys
 
 
-def tshark2pandas(pcap_filename):
-    tshark_proc = subprocess.Popen(['tshark', '-r', pcap_filename, '-Tek', '-n'], stdout=subprocess.PIPE)
+def tshark2pandas(pcap_filename, layers=None):
+    if not layers:
+       layers = ['eth', 'ip', 'frame']
+    layer_args = ['-J', ' '.join(layers)]
+    tshark_proc = subprocess.Popen(['tshark', '-r', pcap_filename, '-Tek', '-n'] + layer_args, stdout=subprocess.PIPE)
     grep_proc = subprocess.Popen(['grep', '-v', '_index'], stdin=tshark_proc.stdout, stdout=subprocess.PIPE)
-    jq_proc = subprocess.Popen(['jq', '-sc', '.[].layers|flatten|add'], stdin=grep_proc.stdout, stdout=subprocess.PIPE)
+    # jq_proc = subprocess.Popen(['jq', '-nc', '--stream', 'fromstream(1|truncate_stream(inputs))|flatten|add'], stdin=grep_proc.stdout, stdout=subprocess.PIPE)
+    jq_proc = subprocess.Popen(['jq', '-c', '-s', '.[].layers|flatten|add'], stdin=grep_proc.stdout, stdout=subprocess.PIPE)
     return pd.read_json(jq_proc.stdout, lines=True)
 
 

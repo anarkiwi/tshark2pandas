@@ -25,6 +25,11 @@ def tshark2pandas(pcap_filename, layers=None, snaplen=256):
     procs.append(subprocess.Popen(['grep', '-v', '_index'], stdin=procs[-1].stdout, stdout=subprocess.PIPE))
     procs.append(subprocess.Popen(['jq', '-c', '-s', JQ_REMAP_SCRIPT], stdin=procs[-1].stdout, stdout=subprocess.PIPE))
     df = pd.read_json(procs[-1].stdout, lines=True)
+    object_cols = {col for col, col_dtype in df.dtypes.iteritems() if col_dtype == object}
+    for col in object_cols:
+        prefixes = df[col].str[:2]
+        if prefixes[0] == '0x' and not prefixes[prefixes != '0x'].any():
+            df[col] = df[col].map(lambda x: int(x, 16))
     for proc in procs:
         proc.wait()
     return df

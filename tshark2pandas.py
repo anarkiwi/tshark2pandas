@@ -10,18 +10,28 @@ TSHARK_ARGS = ['-Tek', '-n']
 
 def tshark2pandas(pcap_filename, layers=None, snaplen=256):
     if layers is None:
-       layers = ['eth', 'ip', 'frame']
+        layers = ['eth', 'ip', 'frame']
     layer_args = []
     if layers:
         layer_args = ['-J', ' '.join(layers)]
     procs = []
+
+    def _proc_stdin():
+        stdin = None
+        if procs:
+            stdin = stdin=procs[-1].stdout
+        return stdin
+
+    def _add_proc(proc_args, stdout=subprocess.PIPE):
+        procs.append(subprocess.Popen(proc_args, stdin=_proc_stdin(), stdout=stdout))
+
     if snaplen:
-        procs.append(subprocess.Popen(['editcap', '-s', str(snaplen), '-F', 'pcap', pcap_filename, '-'], stdout=subprocess.PIPE))
-        procs.append(subprocess.Popen(['tshark', '-r', '-'] + TSHARK_ARGS + layer_args, stdin=procs[-1].stdout, stdout=subprocess.PIPE))
+        _add_proc(['editcap', '-s', str(snaplen), '-F', 'pcap', pcap_filename, '-'])
+        _add_proc(['tshark', '-r', '-'] + TSHARK_ARGS + layer_args)
     else:
-        procs.append(subprocess.Popen(['tshark', '-r', pcap_filename] + TSHARK_ARGS + layer_args, stdout=subprocess.PIPE))
-    procs.append(subprocess.Popen([os.path.join('.', 'tshark2pandas_jsonfilter')], stdin=procs[-1].stdout, stdout=subprocess.PIPE))
-    df = pd.read_json(procs[-1].stdout, lines=True)
+        _add_proc(['tshark', '-r', pcap_filename] + TSHARK_ARGS + layer_args)
+    _add_proc([os.path.join(os.path.dirname(__file__), 'tshark2pandas_jsonfilter')])
+    df = pd.read_json(_proc_stdin(), lines=True)
     for proc in procs:
         proc.wait()
     return df

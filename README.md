@@ -3,6 +3,11 @@ tshark2pandas
 
 This (soon to be) small library, allows pandas to directly ingest JSON from tshark (skipping the more typical pyshark intermediate step).
 
+pyshark has a lot of features and is useful for relatively small numbers of packets. But for analyzing attributes of a large number of packets,
+a framework like pandas is a better fit. However tshark and pandas don't quite meet in the middle - tshark2pandas does the inconvenient
+and messy intermediate work of translating tshark's Elasticsearch export format, into JSON that pandas can easily import.
+
+
 ```
 >>> import pandas as pd
 >>> import tshark2pandas

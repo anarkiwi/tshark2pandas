@@ -28,6 +28,8 @@ int main()
         j_in = j_in.flatten();
         json j_out;
         // selectively copy/parse flattened fields.
+	// TODO: tshark exports some fields as floats, that are really ints - convert them.
+	// TODO: convert IP addresses/MAC addresses to ints.
         for (auto& el : j_in.items()) {
             std::string key = el.key();
             // skip filtered field
@@ -36,8 +38,8 @@ int main()
             }
             // remove initial '/'
             key.erase(0, 1);
-            // use pandas friendly '.' to flatten.
-            std::replace(key.begin(), key.end(), '/', '.');
+            // use pandas friendly '_' to flatten.
+            std::replace(key.begin(), key.end(), '/', '_');
             std::string val;
             // default passthrough.
             j_out[key] = el.value();

@@ -1,0 +1,11 @@
+name: test
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: build 
+      run: |
+        sudo apt-get update && sudo apt-get install -qy python3-dev tshark && sudo pip3 install -U -r requirements.txt && sudo pip3 install -U -r test-requirements.txt && make
+	pytest

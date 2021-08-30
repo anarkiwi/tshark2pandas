@@ -8,7 +8,7 @@ import pandas as pd
 TSHARK_ARGS = ['-Tek', '-n']
 
 
-def tshark2pandas(pcap_filename, layers=None, snaplen=256):
+def tshark2pandas(pcap_filename, layers=None, snaplen=256, raw=False):
     if layers is None:
         layers = ['eth', 'ip', 'frame']
     layer_args = []
@@ -30,26 +30,11 @@ def tshark2pandas(pcap_filename, layers=None, snaplen=256):
         _add_proc(['tshark', '-r', '-'] + TSHARK_ARGS + layer_args)
     else:
         _add_proc(['tshark', '-r', pcap_filename] + TSHARK_ARGS + layer_args)
-    _add_proc([os.path.join(os.path.dirname(__file__), 'tshark2pandas_jsonfilter')])
+    filter_args = [os.path.join(os.path.dirname(__file__), 'tshark2pandas_jsonfilter')]
+    if raw:
+        filter_args += ['-r']
+    _add_proc(filter_args)
     df = pd.read_json(_proc_stdin(), lines=True)
     for proc in procs:
         proc.wait()
     return df
-
-
-def main():
-    if len(sys.argv) == 1:
-        print('need cap')
-        sys.exit(0)
-
-    for pcap_filename in sys.argv[1:]:
-        df = tshark2pandas(pcap_filename)
-        print(df)
-        print(df.dtypes.to_string())
-        for r in df.itertuples():
-            print(r)
-            break
-
-
-if __name__ == '__main__':
-    main()

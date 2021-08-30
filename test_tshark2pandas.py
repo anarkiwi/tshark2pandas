@@ -12,7 +12,7 @@ class Tshark2PandasTestCase(unittest.TestCase):
     def test_tshark2pandas(self):
         df = tshark2pandas(os.path.join(os.path.dirname(__file__), 'test.cap'))
         self.assertEqual(10, len(df))
-        self.assertEqual(10 * 98, df['layers_frame_frame_frame_cap_len'].sum())
+        self.assertEqual(10 * 98, df['layers.frame.frame_frame_cap_len'].sum())
     
 
 if __name__ == '__main__':

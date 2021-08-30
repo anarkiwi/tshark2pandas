@@ -5,21 +5,34 @@
 #include <string>
 
 const std::string filtered_suffix = "filtered";
+const char json_delim = '.';
 
 bool str_endswith(std::string &full, const std::string &suffix) {
     return !full.compare(full.length() - suffix.length(), suffix.length(), suffix);
 }
 
-int main()
+int main(int argc, char* argv[])
 {
     using json = nlohmann::json;
+    bool include_raw = false;
+
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
+        if (arg == "-r") {
+            include_raw = true;
+        }
+    }
 
     for (std::string line; std::getline(std::cin, line);) {
         json j_in = json::parse(line);
+        if (!j_in.contains("timestamp") && !j_in.contains("layers")) {
+            continue;
+        }
         // If no data or layers keys, skip.
         try {
-            j_in.erase("data");
-            j_in["layers"].erase("data");
+            if (!include_raw) {
+                j_in["layers"].erase("data");
+            }
         } catch (json::out_of_range) {
             continue;
         } catch (json::type_error) {
@@ -28,8 +41,8 @@ int main()
         j_in = j_in.flatten();
         json j_out;
         // selectively copy/parse flattened fields.
-	// TODO: tshark exports some fields as floats, that are really ints - convert them.
-	// TODO: convert IP addresses/MAC addresses to ints.
+        // TODO: tshark exports some fields as floats, that are really ints - convert them.
+        // TODO: convert IP addresses/MAC addresses to ints.
         for (auto& el : j_in.items()) {
             std::string key = el.key();
             // skip filtered field
@@ -38,8 +51,7 @@ int main()
             }
             // remove initial '/'
             key.erase(0, 1);
-            // use pandas friendly '_' to flatten.
-            std::replace(key.begin(), key.end(), '/', '_');
+            std::replace(key.begin(), key.end(), '/', json_delim);
             std::string val;
             // default passthrough.
             j_out[key] = el.value();

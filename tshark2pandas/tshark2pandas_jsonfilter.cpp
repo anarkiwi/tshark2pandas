@@ -42,7 +42,6 @@ int main(int argc, char* argv[])
         j_in = j_in.flatten();
         json j_out;
         // selectively copy/parse flattened fields.
-        // TODO: tshark exports some fields as floats, that are really ints - convert them.
         // TODO: convert IP addresses/MAC addresses to ints.
         for (auto& el : j_in.items()) {
             std::string key = el.key();
@@ -59,7 +58,11 @@ int main(int argc, char* argv[])
             }
             size_t first_dot = key.find('.');
             if (first_dot != std::string::npos) {
-                key.erase(first_dot + 1, first_dot + 1 + first_dot + 1);
+                size_t start_pos = first_dot + 1;
+                key.erase(start_pos, start_pos + start_pos);
+            }
+            if (str_endswith(key, ".")) {
+                continue;
             }
             std::string val;
             // default passthrough.
@@ -70,15 +73,25 @@ int main(int argc, char* argv[])
             } catch (json::type_error) {
                 continue;
             }
-            // try to parse as an int or hex string.
             const char *val_str = val.c_str();
-            char* str_end;
-            auto ll_value = strtoll(val_str, &str_end, 0);
-            // was an int.
-            if (*str_end == '\0') {
-                j_out[key] = ll_value;
+            // try to parse as an int or hex string.
+            try {
+                long long ll_val = std::stoll(val_str, NULL, 0);
+                j_out[key] = ll_val;
                 continue;
+            } catch (std::invalid_argument) {
             }
+            char *end_str = NULL;
+            double d_val = std::strtod(val_str, &end_str);
+            if (d_val != 0 || end_str != val_str) {
+                long long ll_val = d_val;
+                if (ll_val == d_val) {
+                    j_out[key] = ll_val;
+                } else {
+                    j_out[key] = d_val;
+                }
+            }
+
         }
         std::cout << j_out.dump() << "\n";
     }

@@ -74,24 +74,17 @@ int main(int argc, char* argv[])
                 continue;
             }
             const char *val_str = val.c_str();
+            const char *val_str_end = val_str + val.length();
             // try to parse as an int or hex string.
             try {
-                long long ll_val = std::stoll(val_str, NULL, 0);
-                j_out[key] = ll_val;
+                char *end = NULL;
+                long long ll_val = std::strtoll(val_str, &end, 0);
+                if (val_str_end == end) {
+                    j_out[key] = ll_val;
+                }
                 continue;
             } catch (std::invalid_argument) {
             }
-            char *end_str = NULL;
-            double d_val = std::strtod(val_str, &end_str);
-            if (d_val != 0 || end_str != val_str) {
-                long long ll_val = d_val;
-                if (ll_val == d_val) {
-                    j_out[key] = ll_val;
-                } else {
-                    j_out[key] = d_val;
-                }
-            }
-
         }
         std::cout << j_out.dump() << "\n";
     }

@@ -5,6 +5,7 @@
 #include <string>
 
 const std::string filtered_suffix = "filtered";
+const std::string layers_prefix = "layers";
 const char json_delim = '.';
 
 bool str_endswith(std::string &full, const std::string &suffix) {
@@ -52,6 +53,14 @@ int main(int argc, char* argv[])
             // remove initial '/'
             key.erase(0, 1);
             std::replace(key.begin(), key.end(), '/', json_delim);
+            // remove layers if present.
+            if (key.find(layers_prefix) == 0) {
+                key.erase(0, layers_prefix.length() + 1);
+            }
+            size_t first_dot = key.find('.');
+            if (first_dot != std::string::npos) {
+                key.erase(first_dot + 1, first_dot + 1 + first_dot + 1);
+            }
             std::string val;
             // default passthrough.
             j_out[key] = el.value();
@@ -68,6 +77,7 @@ int main(int argc, char* argv[])
             // was an int.
             if (*str_end == '\0') {
                 j_out[key] = ll_value;
+                continue;
             }
         }
         std::cout << j_out.dump() << "\n";
